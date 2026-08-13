@@ -20,7 +20,15 @@ export default function NetworkCard({ card, name, className }) {
         'bg-surface shadow-[0_18px_50px_-12px_rgba(0,0,0,0.8)]',
         className,
       )}
-      style={{ filter: 'blur(var(--card-blur, 0px))' }}
+      style={{
+        filter: 'blur(var(--card-blur, 0px))',
+        // `--card-fade` va de 0 a 1 cuando la imagen se retira: difumina el
+        // borde inferior para que no quede un corte recto en pantalla.
+        maskImage:
+          'linear-gradient(to bottom, #000 calc(100% - var(--card-fade, 0) * 55%), transparent 100%)',
+        WebkitMaskImage:
+          'linear-gradient(to bottom, #000 calc(100% - var(--card-fade, 0) * 55%), transparent 100%)',
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

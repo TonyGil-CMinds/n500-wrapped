@@ -72,6 +72,7 @@ export default function OrbitSystem({ className }) {
       {RINGS.map((ring) => (
         <div
           key={ring.size}
+          data-ring
           className="absolute left-1/2 top-1/2 rounded-full border border-lime/35"
           style={{
             width: ring.size,
@@ -93,6 +94,7 @@ export default function OrbitSystem({ className }) {
                 style={{ transform: `rotate(${item.angle}deg) translateY(${-ring.size / 2}px)` }}
               >
                 <div
+                  data-orbit-item
                   data-upright
                   className="-translate-x-1/2 -translate-y-1/2"
                   style={{ width: item.size, height: item.size }}
@@ -122,6 +124,7 @@ export default function OrbitSystem({ className }) {
       <div className="absolute left-1/2 top-1/2">
         <div
           aria-hidden
+          data-orbit-glow
           className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full"
           /* El halo se abre en anillo: apagado en el centro, donde va el logo.
              Con el máximo en el centro, el logo —lima pálido— se perdía. */
@@ -136,6 +139,7 @@ export default function OrbitSystem({ className }) {
         <img
           src="/logo-full.svg"
           alt="N500"
+          data-orbit-logo
           className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2"
           /*
             `maxWidth: none` es imprescindible. El preflight de Tailwind pone

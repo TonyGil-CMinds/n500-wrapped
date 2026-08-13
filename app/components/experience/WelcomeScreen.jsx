@@ -93,8 +93,18 @@ export default function WelcomeScreen({ onStart, sound, needsGesture }) {
         )}
       />
       {/* Se montan al revelar: animate-slice arranca en scaleY(0), así que
-          montarlas aquí es lo que produce el corte desde abajo y desde arriba. */}
-      {revealed ? <GuideLines animate /> : null}
+          montarlas aquí es lo que produce el corte desde abajo y desde arriba.
+          Al arrancar la experiencia se desvanecen con el resto. */}
+      {revealed ? (
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-0 transition-opacity duration-700',
+            leaving && 'opacity-0',
+          )}
+        >
+          <GuideLines animate />
+        </div>
+      ) : null}
       <div
         className={cn(
           'pointer-events-none absolute inset-0 transition-opacity duration-[2000ms]',

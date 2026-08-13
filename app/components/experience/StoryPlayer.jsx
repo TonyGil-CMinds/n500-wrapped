@@ -143,15 +143,17 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound }) 
         </div>
       </header>
 
-      {/* `key` fuerza el remontaje para que las animaciones de entrada
-          vuelvan a dispararse en cada slide. */}
-      {/* `w-full` es necesario: en un flex en columna con `items-center` el
-          hijo se encoge a su contenido, y las slides que se posicionan en
-          absoluto no dejan contenido en flujo con el que medir. */}
+      {/* La capa de la slide cubre la sección entera, padding incluido, y no
+          sólo el hueco entre cabecera y pie: las slides a pantalla completa
+          necesitan llegar a los bordes. Va por debajo (z-10 < z-20) para que
+          la barra de progreso y los controles queden siempre encima.
+
+          `key` fuerza el remontaje y así las animaciones de entrada vuelven a
+          dispararse en cada slide. */}
       <div
         key={slide.id}
         className={cn(
-          'relative z-10 flex w-full flex-1 items-center justify-center',
+          'absolute inset-0 z-10 flex items-center justify-center px-6',
           'transition-all duration-300 [transition-timing-function:cubic-bezier(0.4,0,1,1)]',
           exiting ? 'translate-y-[-14px] scale-[0.97] opacity-0 blur-[2px]' : 'opacity-100',
         )}
@@ -159,7 +161,10 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound }) 
         <StorySlide slide={slide} companyName={companyName} userName={userName} />
       </div>
 
-      <footer className="relative z-10 h-6 text-xs uppercase tracking-[0.25em] text-white/30">
+      {/* Empuja el pie hasta abajo, ya que la slide salió del flujo */}
+      <div className="flex-1" />
+
+      <footer className="relative z-20 h-6 text-xs uppercase tracking-[0.25em] text-white/30">
         {paused ? 'En pausa' : ''}
       </footer>
     </section>

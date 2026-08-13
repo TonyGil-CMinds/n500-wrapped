@@ -90,11 +90,12 @@ export default function StoryHero({ slide, userName }) {
   }, [])
 
   return (
-    // Cubre el área de la slide en vez de dejarse centrar por ella: así el
-    // borde inferior es un punto de anclaje fiable para el retrato. Con
-    // `h-full` el porcentaje no resolvía contra el contenedor flex.
-    <div ref={root} className="absolute inset-0 flex flex-col items-center">
-      <AvatarChip name={userName} data-chip className="mt-4" />
+    // Cubre la pantalla entera: así el borde inferior es un punto de anclaje
+    // fiable para el retrato. El `pt` deja libre la franja de la cabecera, que
+    // se dibuja por encima de esta capa. En vh, no en %: los porcentajes de
+    // padding se resuelven contra el ANCHO del contenedor, no contra el alto.
+    <div ref={root} className="absolute inset-0 flex flex-col items-center pt-[13vh]">
+      <AvatarChip name={userName} data-chip />
 
       <p className="mt-9 text-xs uppercase tracking-[0.3em] text-white/85">
         <SplitWords text={slide.kicker} />
@@ -111,7 +112,7 @@ export default function StoryHero({ slide, userName }) {
       */}
       {/* `-mx-6` compensa el padding lateral de la slide para que el retrato
           pueda ocupar todo el ancho de la pantalla. */}
-      <div className="pointer-events-none absolute inset-x-0 -bottom-16 -mx-6 flex justify-center">
+      <div className="pointer-events-none absolute inset-x-0 -bottom-2 -mx-6 flex justify-center">
         <div className="relative flex w-full justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

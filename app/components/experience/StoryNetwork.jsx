@@ -74,17 +74,27 @@ export default function StoryNetwork({ slide, companyName }) {
       const start = -TURNS * Math.PI * 2
 
       nodes.forEach((el, i) => apply(el, seatFor(i, start)))
-      gsap.set('[data-orbits]', { yPercent: 115, opacity: 0 })
+      // Las órbitas esperan desmontadas visualmente: se revelan pieza a pieza.
+      gsap.set('[data-ring]', { scale: 0.75, opacity: 0 })
+      gsap.set('[data-orbit-item]', { scale: 0, opacity: 0 })
+      gsap.set('[data-orbit-glow], [data-orbit-logo]', { opacity: 0, scale: 0.7 })
+      gsap.set('[data-veil]', { yPercent: 100 })
 
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        gsap.set('[data-cards]', { opacity: 0 })
-        gsap.set('[data-orbits]', { yPercent: 0, opacity: 1 })
-        gsap.set('[data-act1], [data-act2] [data-word], [data-float]', { opacity: 1 })
+        gsap.set('[data-cards], [data-act1], [data-act2]', { opacity: 0 })
+        gsap.set('[data-veil]', { yPercent: 0 })
+        gsap.set('[data-ring], [data-orbit-item], [data-orbit-glow], [data-orbit-logo]', {
+          scale: 1,
+          opacity: 1,
+        })
         return
       }
 
       const wheel = { spin: start }
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+      // El degradado entra fundiéndose, no aparece de golpe con la slide.
+      tl.from('[data-gradient]', { opacity: 0, duration: 1.4, ease: 'power2.out' }, 0)
 
       // ---- Acto 1: la rueda ----
       tl.to(wheel, {
@@ -120,36 +130,50 @@ export default function StoryNetwork({ slide, companyName }) {
         .from('[data-float]', { scale: 0, rotation: -90, opacity: 0, duration: 0.8, ease: 'back.out(2)' }, '-=0.3')
         .to('[data-float]', { y: -12, rotation: 8, duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: -1 }, '<')
 
-      // ---- Acto 2: la tarjeta crece y aparecen las órbitas ----
-      tl.addLabel('crece', '+=1.4')
-        .to('[data-act1]', { opacity: 0, y: -24, duration: 0.6 }, 'crece')
-        // Las tarjetas del fondo se van antes que la destacada.
-        .to(nodes.slice(1), { opacity: 0, scale: 0.8, duration: 0.6, stagger: 0.06 }, 'crece')
-        .to('[data-card-text]', { opacity: 0, duration: 0.5 }, 'crece')
-        // La destacada crece hacia arriba: el origen abajo hace que el borde
-        // superior sea el que avanza, y por eso "revela" el texto.
+      // ---- La tarjeta crece de una sola vez, sin pararse a medio camino ----
+      tl.addLabel('crece', '+=1.2')
+        .to(nodes.slice(1), { opacity: 0, scale: 0.8, duration: 0.5, stagger: 0.05 }, 'crece')
+        .to('[data-card-text]', { opacity: 0, duration: 0.4 }, 'crece')
+        .to('[data-act1]', { opacity: 0, duration: 0.6 }, 'crece+=0.6')
+        // Con el origen abajo es el borde superior el que avanza, y por eso va
+        // tapando el titular en vez de empujarlo.
         .to(
           nodes[0],
-          {
-            scale: 2.6,
-            yPercent: -34,
-            duration: 1.9,
-            ease: 'power2.inOut',
-            transformOrigin: '50% 100%',
-          },
-          'crece+=0.2',
+          { scale: 3.4, duration: 2.6, ease: 'power2.inOut', transformOrigin: '50% 100%' },
+          'crece+=0.1',
         )
-        .to('[data-card-frame]', { borderRadius: 0, borderColor: 'rgba(0,0,0,0)', duration: 1.2 }, 'crece+=0.2')
-        .from('[data-act2] [data-word]', { yPercent: 115, opacity: 0, duration: 0.7, stagger: 0.05 }, 'crece+=1.1')
-        .to('[data-orbits]', { yPercent: 42, opacity: 1, duration: 1.6, ease: 'power2.out' }, 'crece+=0.9')
+        .to(
+          '[data-card-frame]',
+          { borderRadius: 0, borderColor: 'rgba(0,0,0,0)', duration: 1.1 },
+          'crece+=0.7',
+        )
+        .from(
+          '[data-act2] [data-word]',
+          { yPercent: 115, opacity: 0, duration: 0.6, stagger: 0.04 },
+          'crece+=1.7',
+        )
 
-      // ---- Acto 3: las órbitas se centran ----
-      tl.addLabel('orbitas', '+=1.2')
-        .to('[data-act2]', { opacity: 0, y: -20, duration: 0.7 }, 'orbitas')
-        .to(nodes[0], { opacity: 0, yPercent: -70, duration: 1.2, ease: 'power2.in' }, 'orbitas')
-        // El degradado cálido se retira: en este acto manda el verde.
-        .to('[data-gradient]', { opacity: 0.25, duration: 1.4 }, 'orbitas')
-        .to('[data-orbits]', { yPercent: 0, duration: 1.8, ease: 'power2.inOut' }, 'orbitas')
+      // ---- El velo oscuro sube y se lleva imagen y texto por delante ----
+      tl.addLabel('velo', '+=0.7')
+        .to('[data-veil]', { yPercent: 0, duration: 1.1, ease: 'power2.inOut' }, 'velo')
+        .to('[data-gradient]', { opacity: 0, duration: 1 }, 'velo')
+        .to('[data-act2]', { opacity: 0, duration: 0.5 }, 'velo+=0.35')
+        .to(nodes[0], { opacity: 0, duration: 0.5 }, 'velo+=0.8')
+
+      // ---- Y detrás del velo se revelan las órbitas, pieza a pieza ----
+      tl.addLabel('orbitas', 'velo+=0.75')
+        .to('[data-ring]', { scale: 1, opacity: 1, duration: 0.7, stagger: 0.16 }, 'orbitas')
+        .to(
+          '[data-orbit-item]',
+          { scale: 1, opacity: 1, duration: 0.55, stagger: 0.09, ease: 'back.out(2.4)' },
+          'orbitas+=0.45',
+        )
+        .to('[data-orbit-glow]', { opacity: 1, scale: 1, duration: 0.9 }, 'orbitas+=1.15')
+        .to(
+          '[data-orbit-logo]',
+          { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' },
+          'orbitas+=1.3',
+        )
     }, root)
 
     return () => ctx.revert()
@@ -170,12 +194,15 @@ export default function StoryNetwork({ slide, companyName }) {
         <div className="absolute -right-1/4 -top-1/4 h-[380px] w-[380px] animate-drift-slower rounded-full bg-lime/25 blur-[90px]" />
       </div>
 
-      {/* Acto 1 */}
-      <div data-act1 className="relative flex flex-col items-center">
-        <p className="mt-6 text-xs uppercase tracking-[0.3em] text-white/85">
+      {/* Acto 1. Arranca al 19% para no pisar la barra de progreso ni los
+          controles, que van por encima en la cabecera. */}
+      <div data-act1 className="absolute inset-x-0 top-[19%] flex flex-col items-center">
+        <p className="text-xs uppercase tracking-[0.3em] text-white/85">
           <SplitWords text={slide.kicker} />
         </p>
-        <h2 className="relative mt-3 font-display text-[clamp(2.2rem,12vw,4rem)] font-extrabold uppercase leading-[0.95] tracking-tight text-lime-pale">
+        {/* El ancho máximo obliga a partir el nombre en dos líneas, como en la
+            referencia, y deja sitio al destello sin que se salga de cuadro. */}
+        <h2 className="relative mx-auto mt-3 max-w-[290px] font-display text-[clamp(2rem,11.5vw,3.6rem)] font-extrabold uppercase leading-[0.95] tracking-tight text-lime-pale">
           <SplitWords text={companyName} />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -183,7 +210,7 @@ export default function StoryNetwork({ slide, companyName }) {
             src="/asset-green.svg"
             alt=""
             aria-hidden
-            className="absolute -right-3 -top-5 w-14 drop-shadow-[0_0_14px_rgba(211,248,4,0.55)]"
+            className="absolute -right-7 -top-4 w-12 drop-shadow-[0_0_14px_rgba(211,248,4,0.55)]"
           />
         </h2>
       </div>
@@ -191,34 +218,49 @@ export default function StoryNetwork({ slide, companyName }) {
       {/* Acto 2: queda debajo de la tarjeta hasta que ésta crece y lo descubre */}
       <p
         data-act2
-        className="absolute inset-x-0 top-[30%] z-[150] text-center text-xs uppercase tracking-[0.3em] text-white"
+        /* Por encima de las tarjetas: la destacada llega a z-index 200 durante
+           la rueda, y con un valor menor este texto quedaba debajo. */
+        className="absolute inset-x-0 top-[30%] z-[300] text-center text-xs uppercase tracking-[0.3em] text-white"
       >
         <SplitWords text={slide.sub} />
       </p>
 
-      {/* Las tarjetas */}
-      <div data-cards className="pointer-events-none absolute inset-x-0 bottom-0 top-[38%]">
-        <div className="relative mx-auto h-full w-full max-w-[420px]">
-          {cards.map((card, i) => (
-            <div
-              key={card.id}
-              ref={(el) => {
-                cardRefs.current[i] = el
-              }}
-              className="absolute left-1/2 top-4 h-[84%] w-[86%] -translate-x-1/2 will-change-transform"
-            >
-              <NetworkCard
-                card={card}
-                name={i === 0 ? companyName : undefined}
-                className="h-full w-full"
-              />
-            </div>
-          ))}
-        </div>
+      {/* Las tarjetas. Cada una se centra en el viewport y desde ahí GSAP la
+          desplaza por la rueda: así el eje de giro queda en mitad de pantalla
+          y no dentro de una caja con márgenes. Formato vertical, y el borde
+          inferior se sale de cuadro como en la referencia. */}
+      <div data-cards className="pointer-events-none absolute inset-0">
+        {cards.map((card, i) => (
+          <div
+            key={card.id}
+            ref={(el) => {
+              cardRefs.current[i] = el
+            }}
+            className="absolute left-1/2 top-1/2 h-[48vh] w-[76%] max-w-[310px] -translate-x-1/2 will-change-transform"
+          >
+            <NetworkCard
+              card={card}
+              name={i === 0 ? companyName : undefined}
+              className="h-full w-full"
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Las órbitas, que suben desde abajo */}
-      <div data-orbits className="pointer-events-none absolute inset-0 z-[120]">
+      {/* Velo oscuro que sube y tapa imagen y texto. Por encima de todo lo
+          anterior (la tarjeta llega a z-index 200 y el texto a 300). */}
+      <div
+        data-veil
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[350]"
+        style={{
+          background:
+            'linear-gradient(to top, #101511 0%, #101511 62%, rgba(16,21,17,0.85) 82%, transparent 100%)',
+        }}
+      />
+
+      {/* Las órbitas se revelan sobre el velo */}
+      <div data-orbits className="pointer-events-none absolute inset-0 z-[400]">
         <OrbitSystem className="absolute left-1/2 top-1/2 h-0 w-0" />
       </div>
     </div>
