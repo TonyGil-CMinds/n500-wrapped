@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply overflow-x-hidden bg-ink text-white antialiased;
+}
+
+@layer components {
+  .wrapped-slide {
+    @apply relative flex min-h-screen w-full snap-start flex-col items-center justify-center overflow-hidden px-6 text-center;
+  }
+
+  /* Resplandor lima que sube desde el borde inferior. */
+  .glow-floor {
+    background:
+      radial-gradient(
+        62% 42% at 50% 104%,
+        rgba(201, 242, 39, 0.5) 0%,
+        rgba(160, 200, 24, 0.26) 32%,
+        rgba(90, 110, 16, 0.12) 55%,
+        transparent 78%
+      ),
+      radial-gradient(120% 70% at 50% 118%, rgba(184, 224, 26, 0.16) 0%, transparent 60%);
+  }
+
+  /* Guías verticales punteadas del layout.
+     `repeating-` es obligatorio: un linear-gradient normal pinta un único
+     guion y deja el resto transparente. */
+  .guide-line {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.28) 0 5px,
+      transparent 5px 13px
+    );
+    /* Se desvanecen al acercarse al resplandor inferior. */
+    mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 88%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 88%);
+  }
+}
+
+@layer components {
+  /* Playfair usa cifras de estilo antiguo por defecto, así que "Natura500" o
+     "2026" salen con dígitos descendentes. En texto de marca queremos
+     alineadas. */
+  .font-serif {
+    font-variant-numeric: lining-nums proportional-nums;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    /* Sin esto, un animation-delay dejaría el elemento en su estado inicial
+       (opacity: 0) por culpa de animation-fill-mode: both. */
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
