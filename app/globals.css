@@ -48,15 +48,6 @@ body {
   }
 }
 
-@layer components {
-  /* Playfair usa cifras de estilo antiguo por defecto, así que "Natura500" o
-     "2026" salen con dígitos descendentes. En texto de marca queremos
-     alineadas. */
-  .font-serif {
-    font-variant-numeric: lining-nums proportional-nums;
-  }
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;

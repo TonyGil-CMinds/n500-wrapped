@@ -28,7 +28,7 @@ export default function StorySlide({ slide, companyName, userName }) {
           {slide.label}
         </span>
         <span
-          className="mt-3 animate-slide-in font-serif text-2xl italic text-lime-pale"
+          className="mt-3 animate-slide-in text-lg text-lime-pale"
           style={stagger(2)}
         >
           {slide.caption}
@@ -52,7 +52,7 @@ export default function StorySlide({ slide, companyName, userName }) {
           {slide.items.map((item, i) => (
             <li
               key={item}
-              className="animate-slide-in font-serif text-[clamp(1.6rem,7vw,2.6rem)] italic leading-tight text-white"
+              className="animate-slide-in font-display text-[clamp(1.4rem,6vw,2.2rem)] font-bold leading-tight tracking-tight text-white"
               style={stagger(i)}
             >
               {item}
@@ -79,7 +79,7 @@ export default function StorySlide({ slide, companyName, userName }) {
           {slide.kicker}
         </p>
         <p
-          className="mt-3 animate-glow-in font-serif text-[clamp(2.8rem,15vw,5.5rem)] italic leading-[1.05] text-lime"
+          className="mt-3 animate-glow-in font-display text-[clamp(2.4rem,13vw,4.6rem)] font-extrabold uppercase leading-[1.02] tracking-tight text-lime"
           style={stagger(2)}
         >
           {slide.headline}
@@ -100,14 +100,14 @@ export default function StorySlide({ slide, companyName, userName }) {
       {slide.lines.map((line, i) => {
         const isLast = i === slide.lines.length - 1
         const highlight =
-          slide.emphasis === 'serif' || (slide.emphasis === 'last' && isLast)
+          slide.emphasis === 'display' || (slide.emphasis === 'last' && isLast)
         return (
           <p
             key={line}
             className={cn(
               'animate-slide-in text-balance',
               highlight
-                ? 'font-serif text-[clamp(2rem,9vw,3.4rem)] italic leading-tight text-lime-pale'
+                ? 'font-display text-[clamp(1.8rem,8vw,3rem)] font-extrabold leading-[1.05] tracking-tight text-lime-pale'
                 : 'text-[clamp(1.05rem,4.6vw,1.6rem)] leading-snug text-white/80',
             )}
             style={stagger(i, 60)}

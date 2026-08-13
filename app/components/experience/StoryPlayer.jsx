@@ -7,8 +7,11 @@ import Particles from '../ui/Particles'
 import StoryProgress from '../ui/StoryProgress'
 import StorySlide from './StorySlide'
 import { slides } from '../../lib/story'
+import { cn } from '../../lib/cn'
 
 const HOLD_MS = 260
+/** Lo que tarda la slide saliente en desvanecerse antes de montar la siguiente. */
+const EXIT_MS = 340
 
 /**
  * Reproductor del relato, con la mecánica de unas "stories": auto-avance,
@@ -18,20 +21,32 @@ const HOLD_MS = 260
 export default function StoryPlayer({ companyName, userName, onFinish, sound }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [exiting, setExiting] = useState(false)
   const barsRef = useRef([])
   const pressedAt = useRef(0)
+  const leaving = useRef(false)
 
   const slide = slides[index]
 
+  /**
+   * El cambio de slide no es instantáneo: la saliente se desvanece durante
+   * EXIT_MS y sólo entonces se monta la siguiente. Sin esa pausa el corte es
+   * seco, porque el `key` del contenedor desmonta el contenido de golpe.
+   */
   const goTo = useCallback(
     (next) => {
-      if (next >= slides.length) {
-        onFinish()
-        return
-      }
-      if (next < 0) return
+      if (next < 0 || leaving.current) return
+
+      leaving.current = true
+      setExiting(true)
       sound?.whoosh()
-      setIndex(next)
+
+      setTimeout(() => {
+        leaving.current = false
+        setExiting(false)
+        if (next >= slides.length) onFinish()
+        else setIndex(next)
+      }, EXIT_MS)
     },
     [onFinish, sound],
   )
@@ -135,7 +150,11 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound }) 
           absoluto no dejan contenido en flujo con el que medir. */}
       <div
         key={slide.id}
-        className="relative z-10 flex w-full flex-1 items-center justify-center"
+        className={cn(
+          'relative z-10 flex w-full flex-1 items-center justify-center',
+          'transition-all duration-300 [transition-timing-function:cubic-bezier(0.4,0,1,1)]',
+          exiting ? 'translate-y-[-14px] scale-[0.97] opacity-0 blur-[2px]' : 'opacity-100',
+        )}
       >
         <StorySlide slide={slide} companyName={companyName} userName={userName} />
       </div>

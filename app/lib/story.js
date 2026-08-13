@@ -94,7 +94,7 @@ export const slides = [
     kind: 'text',
     ms: 3000,
     lines: ['Y tenemos algo que contarte.'],
-    emphasis: 'serif',
+    emphasis: 'display',
   },
   {
     id: 'seleccion',
@@ -126,7 +126,7 @@ export const slides = [
     kind: 'text',
     ms: 3000,
     lines: ['Y queremos que puedas compartirlo.'],
-    emphasis: 'serif',
+    emphasis: 'display',
   },
 ]
 

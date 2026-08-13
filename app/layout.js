@@ -1,4 +1,4 @@
-import { Host_Grotesk, Playfair_Display, Unbounded } from 'next/font/google'
+import { Host_Grotesk, Unbounded } from 'next/font/google'
 import './globals.css'
 
 /** Cuerpo: botones y párrafos. */
@@ -15,13 +15,6 @@ const unbounded = Unbounded({
   display: 'swap',
 })
 
-/** Acentos en cursiva ("nos conecta"). */
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  style: ['italic', 'normal'],
-  variable: '--font-serif',
-  display: 'swap',
-})
 
 export const metadata = {
   title: 'N500 Wrapped',
@@ -36,7 +29,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="es"
-      className={`${hostGrotesk.variable} ${unbounded.variable} ${playfair.variable}`}
+      className={`${hostGrotesk.variable} ${unbounded.variable}`}
     >
       <body className="min-h-screen bg-ink font-sans text-white">{children}</body>
     </html>

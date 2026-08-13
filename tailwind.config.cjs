@@ -22,7 +22,6 @@ module.exports = {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         // Titulares
         display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
-        serif: ['var(--font-serif)', 'Georgia', 'serif'],
       },
       keyframes: {
         'fade-up': {

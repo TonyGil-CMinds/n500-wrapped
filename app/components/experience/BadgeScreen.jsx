@@ -52,7 +52,7 @@ export default function BadgeScreen({ companyName, onRestart, sound }) {
 
           <div className="mx-auto my-6 h-px w-16 bg-lime/40" />
 
-          <p className="font-serif text-[clamp(1.9rem,9vw,2.8rem)] italic leading-tight text-lime">
+          <p className="font-display text-[clamp(1.6rem,7.5vw,2.4rem)] font-extrabold uppercase leading-tight tracking-tight text-lime">
             {badge.award}
           </p>
           <p className="mt-4 text-xs uppercase tracking-[0.3em] text-white/60">
@@ -102,7 +102,7 @@ export default function BadgeScreen({ companyName, onRestart, sound }) {
         </div>
 
         <p
-          className="mt-10 animate-glow-in font-serif text-[clamp(1.8rem,8vw,2.6rem)] italic text-lime-pale"
+          className="mt-10 animate-glow-in font-display text-[clamp(1.5rem,7vw,2.2rem)] font-extrabold uppercase tracking-tight text-lime-pale"
           style={{ animationDelay: '760ms' }}
         >
           {badge.closing}
