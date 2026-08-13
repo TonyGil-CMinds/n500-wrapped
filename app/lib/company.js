@@ -6,7 +6,7 @@
  * tocar el código.
  */
 export const defaults = {
-  companyName: 'Nombre de Empresa',
+  companyName: 'Litro de Luz',
   userName: 'Bryan Ruiz',
 }
 

@@ -57,6 +57,15 @@ module.exports = {
           '0%, 100%': { transform: 'scaleY(0.45)' },
           '50%': { transform: 'scaleY(1)' },
         },
+        // Deriva de las manchas de color del degradado superior.
+        drift1: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(60px, 40px) scale(1.15)' },
+        },
+        drift2: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1.1)' },
+          '50%': { transform: 'translate(-50px, 30px) scale(0.95)' },
+        },
         // Sentido antihorario, al revés que el `spin` de Tailwind.
         'spin-back': {
           from: { transform: 'rotate(360deg)' },
@@ -77,6 +86,8 @@ module.exports = {
         'glow-in': 'glow-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both',
         wave: 'wave 1s ease-in-out infinite',
         'spin-slow': 'spin-back 6s linear infinite',
+        'drift-slow': 'drift1 14s ease-in-out infinite',
+        'drift-slower': 'drift2 18s ease-in-out infinite',
         'rise-up': 'rise-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },

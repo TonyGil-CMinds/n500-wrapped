@@ -123,7 +123,7 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound }) 
       <GuideLines />
       <Particles />
 
-      <header className="relative z-10 flex w-full max-w-2xl flex-col gap-4">
+      <header className="relative z-20 flex w-full max-w-2xl flex-col gap-4">
         <StoryProgress count={slides.length} index={index} barsRef={barsRef} />
         {/* pr-12 deja hueco al control de sonido, que va fijo arriba a la derecha */}
         <div className="flex items-center justify-between pr-12">

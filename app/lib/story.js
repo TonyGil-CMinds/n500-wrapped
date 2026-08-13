@@ -19,10 +19,10 @@ export const slides = [
   },
   {
     id: 'natura500',
-    kind: 'text',
-    ms: 4200,
-    lines: ['Hace un tiempo, tu empresa decidió formar parte de', 'Natura500.'],
-    emphasis: 'last',
+    kind: 'network',
+    ms: 17000,
+    kicker: 'Hace un tiempo,',
+    sub: 'decidió formar parte de',
   },
   {
     id: 'algo-mas-grande',
