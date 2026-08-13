@@ -46,7 +46,7 @@ export default function BadgeScreen({ companyName, onRestart, sound }) {
         >
           <LogoMark size={56} className="mx-auto" />
 
-          <h2 className="mt-6 font-sans text-3xl font-extrabold uppercase tracking-[0.12em] text-white">
+          <h2 className="mt-6 font-display text-3xl font-extrabold uppercase tracking-[0.12em] text-white">
             {badge.title}
           </h2>
 

@@ -55,11 +55,23 @@ to a phase — the practical way to review one screen without replaying the intr
 
 ## Visual language
 
-Near-black (`ink`) canvas, a lime glow rising from the bottom edge (`.glow-floor`),
-dashed vertical guides at 25%/75% (`GuideLines`), and drifting particles. Headlines
-pair Inter extrabold ("N500") with Playfair Display italic in pale lime
-("nos conecta") — both loaded via `next/font/google` in the root layout, exposed as
-`--font-sans` / `--font-serif` and mapped to `font-sans` / `font-serif`.
+Dark green-black canvas (`ink` = `#101511`), a lime glow rising from the bottom edge
+(`.glow-floor`), dashed vertical guides at 25%/75% (`GuideLines`), drifting particles,
+and `intro-plants.png` rising from the bottom on the welcome screen.
+
+Three fonts, all via `next/font/google` in the root layout:
+
+| Role | Family | CSS var | Tailwind |
+| --- | --- | --- | --- |
+| Headlines | Unbounded | `--font-display` | `font-display` |
+| Body, buttons | Host Grotesk | `--font-sans` | `font-sans` (default) |
+| Italic accents | Playfair Display | `--font-serif` | `font-serif` |
+
+The welcome intro runs **count → letter → logo → ready**: the odometer lands on 500,
+the "N" unfolds, and then the characters give way to `logo-full.svg`. That last step is
+a relay between two layers stacked in the same grid cell — the text scales down and
+blurs out while the SVG scales up in — not a true outline morph, which would mean
+interpolating glyph paths.
 
 Gotchas worth knowing before touching the hero:
 

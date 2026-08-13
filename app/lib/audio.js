@@ -28,7 +28,7 @@ export const music = {
  * Se regeneran con el script de `scripts/` si hace falta afinarlos.
  */
 export const sfx = {
-  click: { src: '/audio/ui/click.wav', volume: 0.5 },
+  click: { src: '/audio/ui/click.wav', volume: 0.18 },
   hover: { src: '/audio/ui/hover.wav', volume: 0.25 },
   whoosh: { src: '/audio/ui/whoosh.wav', volume: 0.35 },
   tick: { src: '/audio/ui/tick.wav', volume: 0.3 },

@@ -25,6 +25,12 @@ export default function Odometer({
   onTick,
   onDone,
   className,
+  /**
+   * Ancho de cada cifra, en el orden en que se pintan. Sirve para que las
+   * ruedas caigan exactamente donde luego irán los caracteres del logotipo,
+   * y el relevo entre ambos no mueva nada.
+   */
+  widths,
 }) {
   const columnsRef = useRef([])
   const wrapperRef = useRef(null)
@@ -104,8 +110,13 @@ export default function Odometer({
       role="status"
       aria-label={`Cargando, contando hasta ${to}`}
     >
-      {positions.map((p) => (
-        <span key={p} className="relative block h-[1em] overflow-hidden" aria-hidden>
+      {positions.map((p, i) => (
+        <span
+          key={p}
+          className="relative block h-[1em] overflow-hidden text-center"
+          style={widths ? { width: widths[i] } : undefined}
+          aria-hidden
+        >
           <span
             ref={(el) => {
               columnsRef.current[p] = el

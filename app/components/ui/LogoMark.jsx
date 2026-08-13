@@ -16,9 +16,9 @@ export default function LogoMark({ className, size = 64, style, ...props }) {
       {/* Halo exterior difuso */}
       <span className="absolute inset-0 rounded-full bg-lime/20 blur-xl" />
 
-      {/* Aro con luz que cae hacia abajo a la izquierda */}
+      {/* Aro con una luz que da vueltas alrededor de la insignia */}
       <span
-        className="absolute inset-0 rounded-full"
+        className="absolute inset-0 animate-spin-slow rounded-full"
         style={{
           background:
             'conic-gradient(from 210deg, rgba(228,245,176,0.55), rgba(184,224,26,0.08) 35%, transparent 60%, rgba(228,245,176,0.3) 100%)',

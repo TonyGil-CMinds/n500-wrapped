@@ -12,10 +12,10 @@
 export const slides = [
   {
     id: 'noticia',
-    kind: 'text',
-    ms: 3200,
-    lines: ['Tenemos una noticia para ti.'],
-    emphasis: 'serif',
+    kind: 'hero',
+    ms: 6000,
+    kicker: 'Tenemos una noticia',
+    headline: 'para ti',
   },
   {
     id: 'natura500',

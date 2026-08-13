@@ -34,8 +34,21 @@ export function useSoundtrack(enabled = true) {
   }
 
   useEffect(() => {
-    if (!active) return
     const players = playersRef.current
+
+    // Silenciar tiene que apagar lo que ya suena. Antes esto salía antes de
+    // tiempo cuando `active` era falso, así que el botón encendía el sonido
+    // pero no lo apagaba.
+    if (!active) {
+      for (const { sound } of Object.values(players)) {
+        if (!sound?.playing()) continue
+        sound.fade(sound.volume(), 0, FADE_MS)
+        setTimeout(() => {
+          if (sound.volume() === 0) sound.stop()
+        }, FADE_MS + 60)
+      }
+      return
+    }
 
     for (const [key, player] of Object.entries(players)) {
       const { sound, volume } = player

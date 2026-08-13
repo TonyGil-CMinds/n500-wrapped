@@ -15,7 +15,7 @@ const HOLD_MS = 260
  * barra por slide, toque a izquierda/derecha para navegar y mantener pulsado
  * para pausar.
  */
-export default function StoryPlayer({ companyName, onFinish, sound }) {
+export default function StoryPlayer({ companyName, userName, onFinish, sound }) {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const barsRef = useRef([])
@@ -130,8 +130,14 @@ export default function StoryPlayer({ companyName, onFinish, sound }) {
 
       {/* `key` fuerza el remontaje para que las animaciones de entrada
           vuelvan a dispararse en cada slide. */}
-      <div key={slide.id} className="relative z-10 flex flex-1 items-center justify-center">
-        <StorySlide slide={slide} companyName={companyName} />
+      {/* `w-full` es necesario: en un flex en columna con `items-center` el
+          hijo se encoge a su contenido, y las slides que se posicionan en
+          absoluto no dejan contenido en flujo con el que medir. */}
+      <div
+        key={slide.id}
+        className="relative z-10 flex w-full flex-1 items-center justify-center"
+      >
+        <StorySlide slide={slide} companyName={companyName} userName={userName} />
       </div>
 
       <footer className="relative z-10 h-6 text-xs uppercase tracking-[0.25em] text-white/30">

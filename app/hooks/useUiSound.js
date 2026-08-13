@@ -17,7 +17,14 @@ export function useUiSound(enabled = true) {
   const ready = useAudioReady()
   const opts = { soundEnabled: enabled && ready, interrupt: true }
 
-  const [playClick] = useSound(sfx.click.src, { ...opts, volume: sfx.click.volume })
+  // El clic lleva cola de reverberación: si se interrumpiera, dos pulsaciones
+  // seguidas cortarían la cola de golpe. Dejándolas solaparse suena como en el
+  // espacio real, donde el segundo golpe no calla el eco del primero.
+  const [playClick] = useSound(sfx.click.src, {
+    ...opts,
+    interrupt: false,
+    volume: sfx.click.volume,
+  })
   const [playHover] = useSound(sfx.hover.src, { ...opts, volume: sfx.hover.volume })
   const [playWhoosh] = useSound(sfx.whoosh.src, { ...opts, volume: sfx.whoosh.volume })
   const [playTick] = useSound(sfx.tick.src, { ...opts, volume: sfx.tick.volume })

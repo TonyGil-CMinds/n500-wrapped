@@ -55,18 +55,129 @@ function pinkNoise(len, seed = 1) {
   return out
 }
 
-// click: golpe corto y seco, con cuerpo grave.
-function click() {
-  const len = n(0.09)
-  const noise = pinkNoise(len, 7)
+/** Ruido blanco determinista: más brillante que el rosa, para impactos. */
+function whiteNoise(len, seed = 1) {
+  let s = seed
   const out = new Float32Array(len)
   for (let i = 0; i < len; i++) {
-    const t = i / RATE
-    const body = Math.sin(2 * Math.PI * 640 * t) * Math.exp(-t * 90)
-    const snap = noise[i] * Math.exp(-t * 160)
-    out[i] = (body * 0.55 + snap * 0.5) * env(i, len, 0.001, 1.4) * 0.5
+    s = (s * 1103515245 + 12345) & 0x7fffffff
+    out[i] = (s / 0x7fffffff) * 2 - 1
   }
   return out
+}
+
+/** Coeficiente de un paso-bajo de un polo, dada la frecuencia de corte. */
+const lpCoef = (hz) => 1 - Math.exp((-2 * Math.PI * hz) / RATE)
+
+/**
+ * Modo resonante: la respuesta al impulso de una cavidad que suena a `hz` y se
+ * apaga en `tau` segundos. Sumando varios se imita el cuerpo de la palma.
+ */
+function mode(out, hz, tau, amp, startSample = 0) {
+  for (let i = startSample; i < out.length; i++) {
+    const t = (i - startSample) / RATE
+    if (t > tau * 6) break
+    out[i] += Math.sin(2 * Math.PI * hz * t) * Math.exp(-t / tau) * amp
+  }
+}
+
+/**
+ * click: una nota suave, no un golpe.
+ *
+ * El objetivo es que no compita con la música sino que forme parte de ella.
+ * Analizando `the-start-of-a-startup.wav` salen F, A y C como clases de altura
+ * dominantes —la tríada de fa mayor—, así que la nota es un DO (C6, la quinta
+ * de la tonalidad): consonante sobre casi cualquier acorde de la pieza.
+ *
+ * No lleva transitorio de ruido. Un ataque instantáneo es justo lo que hace
+ * que un sonido "pinche" por encima de la mezcla en vez de fundirse con ella.
+ */
+function click() {
+  const len = n(0.9)
+  const out = new Float32Array(len)
+
+  const C6 = 1046.5
+  const dryLen = n(0.4)
+  const dry = new Float32Array(dryLen)
+
+  for (let i = 0; i < dryLen; i++) {
+    const t = i / RATE
+    // Ataque de 3 ms: entra en rampa, sin borde.
+    const attack = 1 - Math.exp(-t / 0.003)
+    const fundamental = Math.sin(2 * Math.PI * C6 * t) * Math.exp(-t / 0.085)
+    // Una octava por encima, muy floja y más corta: brillo sin filo.
+    const shimmer = Math.sin(2 * Math.PI * C6 * 2 * t) * Math.exp(-t / 0.035) * 0.18
+    // Y la quinta por debajo (F5), aún más floja, para dar cuerpo.
+    const body = Math.sin(2 * Math.PI * 698.46 * t) * Math.exp(-t / 0.06) * 0.22
+    dry[i] = (fundamental + shimmer + body) * attack
+  }
+
+  normalize(dry, 1)
+
+  for (let i = 0; i < dryLen; i++) out[i] += dry[i]
+
+  // Un resto de sala, corto y muy por detrás: sitúa el sonido sin llamar la
+  // atención.
+  const ir = churchIR(0.55)
+  const WET = 0.14
+  for (let i = 0; i < dryLen; i++) {
+    const d = dry[i] * WET
+    if (d === 0) continue
+    for (let j = 0; j < ir.length && i + j < len; j++) out[i + j] += d * ir[j]
+  }
+
+  return normalize(out, 0.72)
+}
+
+/**
+ * Respuesta al impulso de una nave de piedra.
+ *
+ *  - Un pre-delay largo: en un espacio grande la primera reflexión tarda.
+ *  - Reflexiones tempranas dispersas, de los muros y la bóveda.
+ *  - Cola densa de ruido que decae, con el corte del paso-bajo cerrándose:
+ *    la piedra absorbe los agudos mucho antes que los graves, y sin eso la
+ *    cola suena a siseo blanco en vez de a reverberación.
+ */
+function churchIR(seconds) {
+  const len = n(seconds)
+  const ir = new Float32Array(len)
+  const noise = whiteNoise(len, 8123)
+
+  // Reflexiones tempranas: [retardo en s, ganancia]
+  const early = [
+    [0.028, 0.5],
+    [0.041, 0.4],
+    [0.057, 0.34],
+    [0.073, 0.3],
+    [0.091, 0.26],
+    [0.114, 0.22],
+    [0.138, 0.18],
+  ]
+  for (const [delay, gain] of early) ir[n(delay)] += gain
+
+  const preDelay = n(0.03)
+  const tau = seconds / 6.91 // RT60 ≈ la duración pedida
+  let lp = 0
+  for (let i = preDelay; i < len; i++) {
+    const t = (i - preDelay) / RATE
+    // El corte baja de 8 kHz a ~600 Hz conforme se apaga la cola.
+    lp += lpCoef(600 + 7400 * Math.exp(-t / 0.55)) * (noise[i] - lp)
+    // Los primeros 40 ms suben en rampa: la difusión tarda en formarse.
+    const build = Math.min(1, t / 0.04)
+    ir[i] += lp * Math.exp(-t / tau) * build * 0.55
+  }
+
+  return ir
+}
+
+/** Escala la señal para que su pico quede en `peak`. */
+function normalize(samples, peak) {
+  let max = 0
+  for (const v of samples) max = Math.max(max, Math.abs(v))
+  if (max === 0) return samples
+  const g = peak / max
+  for (let i = 0; i < samples.length; i++) samples[i] *= g
+  return samples
 }
 
 // hover: tick muy tenue y agudo.

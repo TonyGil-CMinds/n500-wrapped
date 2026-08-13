@@ -1,12 +1,21 @@
-import { Inter, Playfair_Display } from 'next/font/google'
+import { Host_Grotesk, Playfair_Display, Unbounded } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({
+/** Cuerpo: botones y párrafos. */
+const hostGrotesk = Host_Grotesk({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
 })
 
+/** Titulares. */
+const unbounded = Unbounded({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+})
+
+/** Acentos en cursiva ("nos conecta"). */
 const playfair = Playfair_Display({
   subsets: ['latin'],
   style: ['italic', 'normal'],
@@ -20,12 +29,15 @@ export const metadata = {
 }
 
 export const viewport = {
-  themeColor: '#0a0b07',
+  themeColor: '#101511',
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
+    <html
+      lang="es"
+      className={`${hostGrotesk.variable} ${unbounded.variable} ${playfair.variable}`}
+    >
       <body className="min-h-screen bg-ink font-sans text-white">{children}</body>
     </html>
   )

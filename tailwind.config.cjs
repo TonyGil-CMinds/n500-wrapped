@@ -4,8 +4,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: '#0a0b07',
-        surface: '#12140d',
+        ink: '#101511',
+        surface: '#171d17',
         lime: {
           DEFAULT: '#b8e01a',
           bright: '#c9f227',
@@ -18,7 +18,10 @@ module.exports = {
         },
       },
       fontFamily: {
+        // Cuerpo, botones y párrafos
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        // Titulares
+        display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
         serif: ['var(--font-serif)', 'Georgia', 'serif'],
       },
       keyframes: {
@@ -51,6 +54,19 @@ module.exports = {
           '60%': { opacity: '1' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        wave: {
+          '0%, 100%': { transform: 'scaleY(0.45)' },
+          '50%': { transform: 'scaleY(1)' },
+        },
+        // Sentido antihorario, al revés que el `spin` de Tailwind.
+        'spin-back': {
+          from: { transform: 'rotate(360deg)' },
+          to: { transform: 'rotate(0deg)' },
+        },
+        'rise-up': {
+          '0%': { opacity: '0', transform: 'translateY(45%)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both',
@@ -60,6 +76,9 @@ module.exports = {
         slice: 'slice 1.1s cubic-bezier(0.16, 1, 0.3, 1) both',
         'slide-in': 'slide-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both',
         'glow-in': 'glow-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both',
+        wave: 'wave 1s ease-in-out infinite',
+        'spin-slow': 'spin-back 6s linear infinite',
+        'rise-up': 'rise-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },
   },

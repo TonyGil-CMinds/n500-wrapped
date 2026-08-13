@@ -1,17 +1,22 @@
 'use client'
 
 import CountUp from '../ui/CountUp'
+import StoryHero from './StoryHero'
 import { cn } from '../../lib/cn'
 
 const stagger = (i, base = 120) => ({ animationDelay: `${base + i * 220}ms` })
 
 /** Pinta una slide del guion según su `kind`. */
-export default function StorySlide({ slide, companyName }) {
+export default function StorySlide({ slide, companyName, userName }) {
+  if (slide.kind === 'hero') {
+    return <StoryHero slide={slide} userName={userName} />
+  }
+
   if (slide.kind === 'stat') {
     return (
       <div className="flex flex-col items-center">
         <span
-          className="animate-slide-in font-sans text-[clamp(4.5rem,26vw,10rem)] font-extrabold leading-none tracking-tight text-lime"
+          className="animate-slide-in font-display text-[clamp(4.5rem,26vw,10rem)] font-extrabold leading-none tracking-tight text-lime"
           style={stagger(0, 0)}
         >
           <CountUp to={slide.value} />
