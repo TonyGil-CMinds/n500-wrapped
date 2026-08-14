@@ -3,13 +3,20 @@
  * URLs servidas estáticamente desde la raíz del sitio.
  */
 
-/** Música de fondo. Cada fase de la experiencia usa una. */
+/**
+ * Música de fondo. Cada fase de la experiencia usa una.
+ *
+ * Van en AAC con MP3 de reserva, y no en WAV: los originales pesaban 10 y
+ * 12 MB, que en una conexión móvil tardan una eternidad en estar listos para
+ * sonar. Comprimidos bajan a menos de 1 MB cada uno. howler recorre la lista
+ * y se queda con el primer formato que el navegador admita.
+ */
 export const music = {
   /** Bucle de la pantalla de bienvenida, antes de empezar. */
   welcome: {
     id: 'glorious-imperfection',
     title: 'Glorious Imperfection',
-    src: '/audio/glorious-imperfection.wav',
+    src: ['/audio/glorious-imperfection.m4a', '/audio/glorious-imperfection.mp3'],
     loop: true,
     volume: 0.45,
   },
@@ -17,7 +24,7 @@ export const music = {
   story: {
     id: 'the-start-of-a-startup',
     title: 'The Start of a Startup',
-    src: '/audio/the-start-of-a-startup.wav',
+    src: ['/audio/the-start-of-a-startup.m4a', '/audio/the-start-of-a-startup.mp3'],
     loop: true,
     volume: 0.4,
   },

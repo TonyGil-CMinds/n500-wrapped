@@ -102,6 +102,19 @@ use-sound never even reaches `play()`. It resumes the context on `pointerdown` i
 track can be queued-but-not-yet-playing. It exposes `needsGesture` for the prompt that
 `ExperienceRoot` renders next to the mute toggle.
 
+**Mobile needs the first `play()` inside the gesture handler itself.** iOS Safari (and
+Android Chrome under data saver) only allow playback started synchronously within a
+user gesture. Resuming the AudioContext in the gesture and playing once React state has
+propagated is too late — the call is silently blocked. `useSoundtrack` therefore keeps
+`soundEnabled` independent of `ready` and starts the current track directly in a
+`pointerdown`/`touchend` listener; only the *track-switching* effect waits for `ready`.
+The listener stays subscribed and retries on every gesture, because on a slow
+connection howler can still be loading when the first taps arrive.
+
+Music ships as AAC with an MP3 fallback (`src` is an array; howler picks the first
+supported). The WAV originals were 10 and 12 MB — far too heavy to be ready to play on
+a phone. Keep new music compressed; only the tiny UI SFX stay WAV.
+
 ## Verifying visually
 
 Chrome headless pins a 500px minimum window width and its `--virtual-time-budget` does

@@ -10,36 +10,66 @@ const FADE_MS = 900
 /**
  * Música de fondo con crossfade entre pistas.
  *
- * Nada se reproduce hasta que `useAudioReady` confirma que el AudioContext
- * está activo: lanzar play() con el contexto suspendido hace que howler encole
- * la reproducción y la suelte al desbloquear, lo que acababa con las dos
- * canciones sonando a la vez.
+ * Sobre el desbloqueo en móvil, que es lo delicado:
+ *
+ *  - En iOS (y en Android con ahorro de datos) el navegador sólo deja arrancar
+ *    audio DENTRO del gesto del usuario. No basta con reanudar el AudioContext
+ *    en el gesto y reproducir después: para cuando el estado de React ha dado
+ *    la vuelta, el gesto ya terminó y la reproducción se bloquea en silencio.
+ *    Por eso el primer `play()` se lanza de forma síncrona en el propio
+ *    manejador del evento, sin pasar por el estado.
+ *
+ *  - Aun así, el efecto que cambia de pista sigue esperando a `ready`. Llamar
+ *    a play() con el contexto suspendido hace que howler encole la
+ *    reproducción y la suelte toda junta al desbloquear.
  *
  * `needsGesture` sirve para ofrecer el aviso de "toca para activar el sonido".
  */
 export function useSoundtrack(enabled = true) {
   const ready = useAudioReady()
-  const active = enabled && ready
 
-  const opts = { loop: true, soundEnabled: active, volume: 0 }
+  // `soundEnabled` NO depende de `ready`: si lo hiciera, use-sound descartaría
+  // el play() que lanzamos dentro del gesto, que es justo el que funciona.
+  const opts = { loop: true, soundEnabled: enabled, volume: 0 }
   const [playWelcome, { sound: welcomeSound }] = useSound(music.welcome.src, opts)
   const [playStory, { sound: storySound }] = useSound(music.story.src, opts)
 
   const [current, setCurrent] = useState(null) // 'welcome' | 'story' | null
   const playersRef = useRef({})
+  const currentRef = useRef(null)
 
+  currentRef.current = current
   playersRef.current = {
     welcome: { sound: welcomeSound, play: playWelcome, volume: music.welcome.volume },
     story: { sound: storySound, play: playStory, volume: music.story.volume },
   }
 
+  // Arranque dentro del gesto. Se mantiene escuchando mientras no haya sonado
+  // nada: en una conexión lenta howler puede tardar en cargar y perderse los
+  // primeros toques, así que cada toque vuelve a intentarlo.
+  useEffect(() => {
+    if (!enabled) return
+
+    const start = () => {
+      const player = playersRef.current[currentRef.current]
+      if (!player?.sound || player.sound.playing()) return
+
+      player.sound.volume(0)
+      player.play() // síncrono: seguimos dentro del gesto
+      player.sound.fade(0, player.volume, FADE_MS)
+    }
+
+    const events = ['pointerdown', 'touchend', 'keydown']
+    events.forEach((e) => window.addEventListener(e, start, { capture: true }))
+    return () => events.forEach((e) => window.removeEventListener(e, start, { capture: true }))
+  }, [enabled])
+
+  // Cambio de pista y silenciado.
   useEffect(() => {
     const players = playersRef.current
 
-    // Silenciar tiene que apagar lo que ya suena. Antes esto salía antes de
-    // tiempo cuando `active` era falso, así que el botón encendía el sonido
-    // pero no lo apagaba.
-    if (!active) {
+    // Silenciar tiene que apagar lo que ya suena.
+    if (!enabled) {
       for (const { sound } of Object.values(players)) {
         if (!sound?.playing()) continue
         sound.fade(sound.volume(), 0, FADE_MS)
@@ -49,6 +79,9 @@ export function useSoundtrack(enabled = true) {
       }
       return
     }
+
+    // Sin gesto todavía: no tocamos nada, que howler encolaría.
+    if (!ready) return
 
     for (const [key, player] of Object.entries(players)) {
       const { sound, volume } = player
@@ -76,7 +109,7 @@ export function useSoundtrack(enabled = true) {
         sound.volume(0)
       }
     }
-  }, [current, active, welcomeSound, storySound])
+  }, [current, enabled, ready, welcomeSound, storySound])
 
   // Al desmontar, corta cualquier pista viva.
   useEffect(() => {

@@ -66,7 +66,13 @@ export default function AudioPlayer({ track }) {
 
   return (
     <div className="flex w-full max-w-md items-center gap-4 rounded-2xl border border-white/10 bg-surface/80 p-4">
-      <audio ref={audioRef} src={track.src} preload="metadata" />
+      {/* `track.src` es una lista de formatos; aquí basta con el primero que
+          entienda el navegador, así que van como <source>. */}
+      <audio ref={audioRef} preload="metadata">
+        {(Array.isArray(track.src) ? track.src : [track.src]).map((src) => (
+          <source key={src} src={src} />
+        ))}
+      </audio>
 
       <button
         type="button"
