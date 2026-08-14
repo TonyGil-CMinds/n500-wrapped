@@ -50,9 +50,12 @@ const STACK = [
  *  3. Las órbitas terminan de subir y se centran: fotos girando alrededor del
  *     logo de N500 sobre un resplandor verde.
  */
-export default function StoryNetwork({ slide, companyName }) {
+export default function StoryNetwork({ slide, companyName, sound }) {
   const root = useRef(null)
   const cardRefs = useRef([])
+  // En una ref para que el efecto no dependa de la identidad del objeto.
+  const soundRef = useRef(sound)
+  soundRef.current = sound
 
   useEffect(() => {
     const nodes = cardRefs.current.filter(Boolean)
@@ -73,7 +76,11 @@ export default function StoryNetwork({ slide, companyName }) {
       const seatFor = (i, spin) => seatAt((i / nodes.length) * Math.PI * 2 + spin)
       const start = -TURNS * Math.PI * 2
 
-      nodes.forEach((el, i) => apply(el, seatFor(i, start)))
+      // Arrancan encogidas e invisibles: entran una a una antes de girar.
+      nodes.forEach((el, i) => {
+        const seat = seatFor(i, start)
+        apply(el, { ...seat, opacity: 0, scale: seat.scale * 0.55 })
+      })
       // Las órbitas esperan desmontadas visualmente: se revelan pieza a pieza.
       gsap.set('[data-ring]', { scale: 0.75, opacity: 0 })
       gsap.set('[data-orbit-item]', { scale: 0, opacity: 0 })
@@ -96,12 +103,39 @@ export default function StoryNetwork({ slide, companyName }) {
       // El degradado entra fundiéndose, no aparece de golpe con la slide.
       tl.from('[data-gradient]', { opacity: 0, duration: 1.4, ease: 'power2.out' }, 0)
 
+      // ---- Las tarjetas entran una a una ----
+      tl.to(
+        nodes,
+        {
+          opacity: (i) => seatFor(i, start).opacity,
+          scale: (i) => seatFor(i, start).scale,
+          duration: 0.5,
+          stagger: 0.14,
+          ease: 'back.out(1.6)',
+          onStart: () => soundRef.current?.card(),
+        },
+        0.15,
+      )
+
       // ---- Acto 1: la rueda ----
+      // Un tic por cada tarjeta que pasa por delante. Como el giro frena, los
+      // tics se van espaciando solos, igual que en una ruleta.
+      let seatsPassed = 0
+      const seatArc = (Math.PI * 2) / nodes.length
+
       tl.to(wheel, {
         spin: 0,
         duration: 2.9,
         ease: 'power2.inOut',
-        onUpdate: () => nodes.forEach((el, i) => apply(el, seatFor(i, wheel.spin))),
+        onUpdate: () => {
+          nodes.forEach((el, i) => apply(el, seatFor(i, wheel.spin)))
+
+          const passed = Math.floor((wheel.spin - start) / seatArc)
+          if (passed > seatsPassed) {
+            seatsPassed = passed
+            soundRef.current?.card()
+          }
+        },
       })
 
       nodes.forEach((el, i) => {
@@ -174,6 +208,16 @@ export default function StoryNetwork({ slide, companyName }) {
           { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.7)' },
           'orbitas+=1.3',
         )
+
+      // ---- Cierre: la oscuridad se come las órbitas ----
+      //
+      // Se coloca en tiempo absoluto contado desde el final de la slide, no
+      // relativo a la etiqueta anterior. Encadenado, el velo terminaba después
+      // del cambio de slide y las órbitas asomaban un instante; así queda
+      // negro del todo casi un segundo antes, pase lo que pase por delante.
+      const OUTRO_MS = 1200
+      const outroAt = Math.max(0, (slide.ms - OUTRO_MS - 900) / 1000)
+      tl.to('[data-outro]', { opacity: 1, duration: OUTRO_MS / 1000, ease: 'power2.in' }, outroAt)
     }, root)
 
     return () => ctx.revert()
@@ -263,6 +307,13 @@ export default function StoryNetwork({ slide, companyName }) {
       <div data-orbits className="pointer-events-none absolute inset-0 z-[400]">
         <OrbitSystem className="absolute left-1/2 top-1/2 h-0 w-0" />
       </div>
+
+      {/* Oscuridad final: entra sobre todo lo demás para cerrar la slide */}
+      <div
+        data-outro
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[500] bg-ink opacity-0"
+      />
     </div>
   )
 }

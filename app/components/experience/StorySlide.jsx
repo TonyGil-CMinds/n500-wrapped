@@ -1,6 +1,7 @@
 'use client'
 
 import CountUp from '../ui/CountUp'
+import StoryCount from './StoryCount'
 import StoryNetwork from './StoryNetwork'
 import StoryHero from './StoryHero'
 import { cn } from '../../lib/cn'
@@ -8,13 +9,37 @@ import { cn } from '../../lib/cn'
 const stagger = (i, base = 120) => ({ animationDelay: `${base + i * 220}ms` })
 
 /** Pinta una slide del guion según su `kind`. */
-export default function StorySlide({ slide, companyName, userName }) {
+export default function StorySlide({ slide, companyName, userName, sound }) {
   if (slide.kind === 'hero') {
     return <StoryHero slide={slide} userName={userName} />
   }
 
   if (slide.kind === 'network') {
-    return <StoryNetwork slide={slide} companyName={companyName} />
+    return <StoryNetwork slide={slide} companyName={companyName} sound={sound} />
+  }
+
+  // Antetítulo pequeño y titular grande, centrados en la pantalla.
+  if (slide.kind === 'statement') {
+    return (
+      <div className="flex max-w-xl flex-col items-center">
+        <p
+          className="animate-slide-in text-[0.68rem] uppercase tracking-[0.28em] text-white/85"
+          style={stagger(0, 0)}
+        >
+          {slide.kicker}
+        </p>
+        <h2
+          className="mt-6 animate-slide-in font-display text-[clamp(2.4rem,13vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight text-lime-pale"
+          style={stagger(1)}
+        >
+          {slide.headline}
+        </h2>
+      </div>
+    )
+  }
+
+  if (slide.kind === 'count') {
+    return <StoryCount slide={slide} sound={sound} />
   }
 
   if (slide.kind === 'stat') {

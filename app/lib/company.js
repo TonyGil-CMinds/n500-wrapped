@@ -19,5 +19,7 @@ export function resolveRecipient(searchParams = {}) {
     // `?fase=story` entra directo a esa pantalla, para revisarla sin tener
     // que recorrer la experiencia entera cada vez.
     initialPhase: PHASES.includes(searchParams.fase) ? searchParams.fase : 'welcome',
+    //  abre el relato directamente en esa slide.
+    initialSlide: Number.parseInt(searchParams.slide, 10) || 0,
   }
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import GuideLines from '../ui/GuideLines'
 import LogoMark from '../ui/LogoMark'
 import Particles from '../ui/Particles'
 import StoryProgress from '../ui/StoryProgress'
@@ -18,8 +17,8 @@ const EXIT_MS = 340
  * barra por slide, toque a izquierda/derecha para navegar y mantener pulsado
  * para pausar.
  */
-export default function StoryPlayer({ companyName, userName, onFinish, sound }) {
-  const [index, setIndex] = useState(0)
+export default function StoryPlayer({ companyName, userName, onFinish, sound, initialSlide = 0 }) {
+  const [index, setIndex] = useState(Math.min(Math.max(initialSlide, 0), slides.length - 1))
   const [paused, setPaused] = useState(false)
   const [exiting, setExiting] = useState(false)
   const barsRef = useRef([])
@@ -119,9 +118,18 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound }) 
       onPointerUp={handlePointerUp}
       onPointerLeave={() => setPaused(false)}
     >
-      <div aria-hidden className="glow-floor pointer-events-none absolute inset-0" />
-      <GuideLines />
-      <Particles />
+      {/* El resplandor y las partículas viven fuera de la slide, así que sin
+          esto seguirían encendidos durante el cambio. Se apagan mientras dura
+          la salida y vuelven con la slide siguiente. */}
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-0 transition-opacity duration-300',
+          exiting ? 'opacity-0' : 'opacity-100',
+        )}
+      >
+        <div aria-hidden className="glow-floor absolute inset-0" />
+        <Particles />
+      </div>
 
       <header className="relative z-20 flex w-full max-w-2xl flex-col gap-4">
         <StoryProgress count={slides.length} index={index} barsRef={barsRef} />
@@ -158,7 +166,12 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound }) 
           exiting ? 'translate-y-[-14px] scale-[0.97] opacity-0 blur-[2px]' : 'opacity-100',
         )}
       >
-        <StorySlide slide={slide} companyName={companyName} userName={userName} />
+        <StorySlide
+          slide={slide}
+          companyName={companyName}
+          userName={userName}
+          sound={sound}
+        />
       </div>
 
       {/* Empuja el pie hasta abajo, ya que la slide salió del flujo */}

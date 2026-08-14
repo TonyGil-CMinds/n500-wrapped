@@ -33,6 +33,7 @@ export const sfx = {
   whoosh: { src: '/audio/ui/whoosh.wav', volume: 0.35 },
   tick: { src: '/audio/ui/tick.wav', volume: 0.3 },
   reveal: { src: '/audio/ui/reveal.wav', volume: 0.5 },
+  card: { src: '/audio/ui/card.wav', volume: 0.22 },
 }
 
 /** Lista plana, útil para precargar o para la página de demo. */

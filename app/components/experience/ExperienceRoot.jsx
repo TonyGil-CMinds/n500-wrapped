@@ -14,7 +14,12 @@ import { cn } from '../../lib/cn'
  * También es la dueña del audio, para que la música sobreviva a los cambios
  * de pantalla y pueda hacer crossfade entre pistas.
  */
-export default function ExperienceRoot({ userName, companyName, initialPhase = 'welcome' }) {
+export default function ExperienceRoot({
+  userName,
+  companyName,
+  initialPhase = 'welcome',
+  initialSlide = 0,
+}) {
   const [phase, setPhase] = useState(initialPhase)
   const [soundOn, setSoundOn] = useState(true)
 
@@ -39,6 +44,7 @@ export default function ExperienceRoot({ userName, companyName, initialPhase = '
         <StoryPlayer
           companyName={companyName}
           userName={userName}
+          initialSlide={initialSlide}
           sound={sound}
           onFinish={() => setPhase('badge')}
         />

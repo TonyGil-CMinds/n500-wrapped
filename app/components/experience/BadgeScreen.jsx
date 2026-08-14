@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Button from '../ui/Button'
-import GuideLines from '../ui/GuideLines'
 import LogoMark from '../ui/LogoMark'
 import Particles from '../ui/Particles'
 import { badge } from '../../lib/story'
@@ -31,7 +30,6 @@ export default function BadgeScreen({ companyName, onRestart, sound }) {
   return (
     <section className="wrapped-slide justify-start gap-10 overflow-y-auto py-16">
       <div aria-hidden className="glow-floor pointer-events-none absolute inset-0" />
-      <GuideLines />
       <Particles />
 
       <div className="relative z-10 flex w-full max-w-xl flex-col items-center">

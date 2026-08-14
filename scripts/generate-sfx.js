@@ -180,6 +180,31 @@ function normalize(samples, peak) {
   return samples
 }
 
+/**
+ * card: el tic de cada tarjeta al pasar por delante en la rueda.
+ *
+ * Suena muchas veces seguidas mientras la rueda gira, así que tiene que ser
+ * discreto: un golpecito de madera, corto y sin brillo. La nota es un LA
+ * (A5), tercera de fa mayor, para que encaje con la música.
+ */
+function card() {
+  const len = n(0.09)
+  const out = new Float32Array(len)
+  const noise = whiteNoise(len, 3307)
+  const c = lpCoef(1400)
+  let a = 0
+  let b = 0
+  for (let i = 0; i < len; i++) {
+    const t = i / RATE
+    a += c * (noise[i] - a)
+    b += c * (a - b)
+    out[i] = b * Math.exp(-t / 0.004) * 4
+  }
+  mode(out, 880, 0.012, 0.5)
+  mode(out, 1320, 0.006, 0.14)
+  return normalize(out, 0.5)
+}
+
 // hover: tick muy tenue y agudo.
 function hover() {
   const len = n(0.05)
@@ -244,7 +269,7 @@ function reveal() {
   return out
 }
 
-const files = { click, hover, whoosh, tick, reveal }
+const files = { click, hover, whoosh, tick, reveal, card }
 fs.mkdirSync(OUT, { recursive: true })
 for (const [name, fn] of Object.entries(files)) {
   const buf = wav(fn())

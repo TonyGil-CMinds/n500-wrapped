@@ -29,6 +29,7 @@ export function useUiSound(enabled = true) {
   const [playWhoosh] = useSound(sfx.whoosh.src, { ...opts, volume: sfx.whoosh.volume })
   const [playTick] = useSound(sfx.tick.src, { ...opts, volume: sfx.tick.volume })
   const [playReveal] = useSound(sfx.reveal.src, { ...opts, volume: sfx.reveal.volume })
+  const [playCard] = useSound(sfx.card.src, { ...opts, volume: sfx.card.volume })
 
   return {
     click: useCallback(() => playClick(), [playClick]),
@@ -36,5 +37,6 @@ export function useUiSound(enabled = true) {
     whoosh: useCallback(() => playWhoosh(), [playWhoosh]),
     tick: useCallback(() => playTick(), [playTick]),
     reveal: useCallback(() => playReveal(), [playReveal]),
+    card: useCallback(() => playCard(), [playCard]),
   }
 }
