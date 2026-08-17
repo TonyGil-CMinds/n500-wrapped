@@ -1,9 +1,11 @@
 'use client'
 
 import CountUp from '../ui/CountUp'
+import StoryBlue from './StoryBlue'
 import StoryCount from './StoryCount'
 import StoryNetwork from './StoryNetwork'
 import StoryHero from './StoryHero'
+import StoryTypes from './StoryTypes'
 import { cn } from '../../lib/cn'
 
 const stagger = (i, base = 120) => ({ animationDelay: `${base + i * 220}ms` })
@@ -40,6 +42,14 @@ export default function StorySlide({ slide, companyName, userName, sound }) {
 
   if (slide.kind === 'count') {
     return <StoryCount slide={slide} sound={sound} />
+  }
+
+  if (slide.kind === 'blue') {
+    return <StoryBlue slide={slide} sound={sound} />
+  }
+
+  if (slide.kind === 'types') {
+    return <StoryTypes slide={slide} sound={sound} />
   }
 
   if (slide.kind === 'stat') {

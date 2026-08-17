@@ -36,6 +36,15 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound, in
     (next) => {
       if (next < 0 || leaving.current) return
 
+      // Algunas slides continúan la anterior: empiezan justo en su último
+      // fotograma. Ahí el desvanecido sobra —cortaría por la mitad una
+      // animación que en realidad no se ha interrumpido—, así que se cambia
+      // en seco y el corte no se ve porque los dos fotogramas coinciden.
+      if (next > index && slides[next]?.continuous) {
+        setIndex(next)
+        return
+      }
+
       leaving.current = true
       setExiting(true)
       sound?.whoosh()
@@ -47,7 +56,7 @@ export default function StoryPlayer({ companyName, userName, onFinish, sound, in
         else setIndex(next)
       }, EXIT_MS)
     },
-    [onFinish, sound],
+    [index, onFinish, sound],
   )
 
   // Avance automático. El progreso se escribe por ref: un setState por frame

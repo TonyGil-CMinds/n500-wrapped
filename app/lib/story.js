@@ -43,9 +43,26 @@ export const slides = [
     greenHeadline: 'Verdes',
   },
   {
+    id: 'azules',
+    kind: 'blue',
+    ms: 9000,
+    // Continúa la pantalla anterior sin corte: empieza en su último fotograma,
+    // así que necesita el mismo titular verde para arrancar.
+    continuous: true,
+    greenKicker: 'Empresas',
+    greenHeadline: 'Verdes',
+    kicker: 'Empresas',
+    headline: 'Azules',
+  },
+  {
     id: 'tipos',
-    kind: 'list',
-    ms: 4600,
+    kind: 'types',
+    ms: 10000,
+    // Empieza en el último fotograma de la pantalla azul, así que necesita su
+    // titular para pintarlo.
+    continuous: true,
+    fromKicker: 'Empresas',
+    fromHeadline: 'Azules',
     items: ['Startups', 'PyMEs', 'Cooperativas', 'Empresas sociales'],
   },
   {

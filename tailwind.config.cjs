@@ -12,6 +12,11 @@ module.exports = {
           pale: '#e4f5b0',
           deep: '#6b7d10',
         },
+        azul: {
+          DEFAULT: '#2b3fd4',
+          deep: '#1b2aa8',
+          pale: '#8ab6f0',
+        },
         accent: {
           DEFAULT: '#b8e01a',
           soft: '#e4f5b0',

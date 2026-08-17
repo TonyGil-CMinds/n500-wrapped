@@ -52,6 +52,26 @@ the audio so music survives phase changes and can crossfade.
 
 `/?empresa=X&usuario=Y` overrides the recipient and `&fase=story|badge` jumps straight
 to a phase — the practical way to review one screen without replaying the intro.
+`&slide=N` starts the story on a given slide.
+
+Backgrounds change by **revealing**, never by sliding in. `lib/mask.js` holds the
+diagonal `clip-path`, driven by a `--reveal` custom property that GSAP animates from 0
+to 1; the photo stays put and only the cut moves. A panel that travels reads as a sheet
+laid on top of the scene, which is the thing this avoids.
+
+A slide marked `continuous: true` in the script is swapped **without** the exit fade:
+it starts on the previous slide's last frame, so the usual blur-and-scale-out would cut
+an animation that never actually stopped. The seam only disappears if the two frames
+are identical, which is why `GreenScene` and `BlueScene` exist — `StoryCount` ends on
+the first and `StoryBlue` opens on it; `StoryBlue` builds the second and `StoryTypes`
+opens on it. Same markup, not a copy.
+
+Those scenes take a `phase`/`revealed` prop that writes the starting state as an inline
+style. Do not reach for `gsap.set` instead: it runs after the first paint, and on a
+continuous slide that one frame shows the wrong state right at the seam. Mind the units
+when GSAP later animates away from an inline transform — `translateY(100%)` is read as
+pixels, so a `to({yPercent: 0})` leaves the pixel offset behind and the element never
+arrives. Use `fromTo` and zero the `y`.
 
 ## Visual language
 
@@ -121,6 +141,15 @@ Chrome headless pins a 500px minimum window width and its `--virtual-time-budget
 not advance `requestAnimationFrame`, so `--screenshot` alone will misreport both layout
 and any rAF animation. Drive it over CDP instead (`Emulation.setDeviceMetricsOverride`
 for a true 402px viewport, real waits, `Input.dispatchMouseEvent` for clicks).
+
+Two things that make that browser lie about timing:
+
+- Launch it with `--disable-backgrounding-occluded-windows --disable-renderer-backgrounding`.
+  A window hidden behind the terminal gets its rAF throttled to a crawl, and GSAP's
+  lag smoothing then stretches every timeline by an order of magnitude — the animation
+  looks stalled when the only problem is that nothing is being painted.
+- Start it detached (PowerShell `Start-Process`). Launched from the Bash tool it dies
+  with the shell that spawned it, taking the debugging port with it.
 
 Everything is a Server Component by default; only `AudioPlayer` carries `'use client'`. Keep interactivity pushed down into small client leaves rather than marking sections or pages as client.
 
